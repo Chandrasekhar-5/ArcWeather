@@ -31,9 +31,44 @@ async function getWeather(city) {
     const data = await res.json();
     updateUI(data);
 
+    const { lat, lon } = data.coord; 
+    get7DayForecast(lat, lon);
+
   } catch (err) {
     alert("City not found ❌");
   }
+}
+
+async function get7DayForecast(lat, lon) {
+    const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,hourly,alerts&units=metric&appid=${apiKey}`
+    );
+
+    const data = await res.json();
+    renderForecast(data.daily);
+}
+
+const forecastList = document.getElementById("forecastList");
+
+function renderForecast(days) {
+    forecastList.innerHTML = "";
+
+    days.slice(1, 8).forEach(day => {
+        const date = new Date(day.dt * 1000).toLocaleDateString("en-us", {
+            weekday: "short"
+        });
+
+        const icon = `https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png`;
+
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <span>${date}</span>
+            <img src = "${icon}" alt = "${day.weather[0].description}">
+            <span>${Math.round(day.temp.max)}° / ${Math.round(day.temp.min)}°</span>
+        `;
+
+        forecastList.appendChild(li);
+    });
 }
 
 function updateUI(data) {
@@ -63,7 +98,7 @@ function updateUI(data) {
   `;
 
   cards[3].querySelector("h2").innerText = `${main.humidity}%`;
-  cards[4].querySelector("h2").innerText = `${(visibility/1000).toFixed(1)} km`;
+  cards[4].querySelector("h2").innerText = visibility ? `${(visibility/1000).toFixed(1)} km` : "N/A";
   cards[5].querySelector("h2").innerText = `${Math.round(main.feels_like)}°`;
 }
 
