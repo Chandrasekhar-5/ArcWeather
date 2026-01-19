@@ -11,92 +11,55 @@
 
 <div class="app">
 
-  <aside class="sidebar">
-    <h2 class="logo">ArcWeather</h2>
-    <nav>
-        <button class="active" title="Dashboard">
-            <i class="fas fa-cloud"></i>
-        </button>
+  <main class="dashboard">
 
-        <button title="Map">
-            <i class="fas fa-map"></i>
-        </button>
-
-        <button title="Settings">
-            <i class="fas fa-cog"></i>
-        </button>
-    </nav>
-    <div class="profile"><i class="fas fa-user"></div>
-  </aside>
-
-  <main class="main">
-
-    <section class="card main-weather">
-      <div class = "weather-info">
-        <h1>28°</h1>
-        <p>Rainy Storm Clouds</p>
-        <span><i class="fas fa-map-pin"></i>Visakhapatnam, India • 5:01 AM</span>
+  <section class="top-row">
+    <div class="card hero-weather">
+      <div class="hero-left">
+        <h1 id="temp">27°</h1>
+        <p id="desc">Haze</p>
+        <span id="location">Visakhapatnam, IN • 01:48 PM</span>
       </div>
-      <div class="weather-icon" id = "mainWeatherIcon">
-        <i class="fas fa-cloud-showers-heavy fa-3x"></i>
-      </div>
+
+      <div class="hero-icon" id="mainWeatherIcon"></div>
 
       <div class="search">
-            <input type="text" placeholder="Search city..." id="cityInput">
-            <button id="searchBtn"><i class="fas fa-search"></i></button>
-        </div>
-    </section>
+        <input type="text" placeholder="Search city..." id="cityInput" />
+        <button id="searchBtn">🔍</button>
+      </div>
+    </div>
+  </section>
 
-    <section class="highlights">
-      <div class="card">
-        <h4><i class="fas fa-wind"></i> Wind Status</h4>
-        <h2>7.9 <span>km/h</span></h2>
-      </div>
-      <div class="card uv-card">
-        <h4><i class="fas fa-sun"></i> UV Index</h4>
+  <section class="stats-grid">
+    <div class="card wide">Wind Status <h2 id="wind">5.6 km/h</h2></div>
+    <div class="card uv-card">
+      <h4>UV Index</h4>
+      <svg class="uv-gauge" viewBox="0 0 200 120">
+        <path d="M20 100 A80 80 0 0 1 180 100" class="uv-bg"/>
+        <path d="M20 100 A80 80 0 0 1 180 100" class="uv-progress"/>
+      </svg>
+      <div class="uv-value" id="uvValue">8.4</div>
+    </div>
+    <div class="card">Sunrise & Sunset <p id="sun">06:31 / 17:44</p></div>
+    <div class="card">Humidity <h2 id="humidity">57%</h2></div>
+    <div class="card">Visibility <h2 id="visibility">3.0 km</h2></div>
+    <div class="card">Feels Like <h2 id="feels">28°</h2></div>
+  </section>
 
-        <svg class="uv-gauge" viewBox="0 0 200 120">
-            <path d="M20 100 A80 80 0 0 1 180 100" class="uv-bg"/>
-            <path d="M20 100 A80 80 0 0 1 180 100" class="uv-progress"/>
-        </svg>
+  <section class="bottom-row">
+    <div class="card forecast-card">
+      <h3>7 Days Forecast</h3>
+      <ul id="forecastList"></ul>
+    </div>
 
-        <div class = "uv-value" id = "uvValue">0.0</div>
-      </div>
-      <div class="card">
-        <h4><i class="fas fa-sun"></i>Sunrise & Sunset</h4>
-        <p><i class="fas fa-sunrise"></i>5:50 AM</p>
-        <p><i class="fas fa-sunset"></i>6:30 PM</p>
-      </div>
-      <div class="card">
-        <h4><i class="fas fa-tint"></i> Humidity</h4>
-        <h2>84%</h2>
-      </div>
-      <div class="card">
-        <h4><i class="fas fa-eye"></i> Visibility</h4>
-        <h2>03 km</h2>
-      </div>
-      <div class="card">
-        <h4><i class="fas fa-temperature-high"></i> Feels Like</h4>
-        <h2>42°</h2>
-      </div>
-    </section>
+    <div class="card map-card">
+      <h3>Weather Condition Map</h3>
+      <div class="map-box">Map Preview</div>
+    </div>
+  </section>
 
-    <section class="bottom">
-      <div class="card forecast">
-        <h3><i class="fas fa-calendar-alt"></i> 7 Days Forecast</h3>
-        <ul id="forecastList"></ul>
-      </div>
+</main>
 
-      <div class="card map">
-        <h3><i class="fas fa-map-marked-alt"></i> Weather Condition Map</h3>
-        <div class="map-box">
-            <i class="fas fa-map fa-3x"></i>
-            <p>Map Preview</p>
-        </div>
-      </div>
-    </section>
-
-  </main>
 </div>
 
 <script src="script.js"></script>
