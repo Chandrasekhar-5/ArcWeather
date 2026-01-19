@@ -78,6 +78,21 @@ body {
   align-items: center;
 }
 
+.search input {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  outline: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.search input::placeholder {
+  color: #aaa;
+}
+
+
 .main-weather h1 {
   font-size: 64px;
 }
