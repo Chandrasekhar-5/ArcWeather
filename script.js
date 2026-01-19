@@ -1,25 +1,23 @@
 console.log("Weather dashboard loaded");
 
-document.querySelectorAll(".card").forEach(card => {
-  card.addEventListener("mouseenter", () => {
-    card.style.transform = "translateY(-6px)";
-  });
-  card.addEventListener("mouseleave", () => {
-    card.style.transform = "translateY(0)";
-  });
-});
-
 const apiKey = "b8b194e0af47f755994f27a30ba55d45";
 
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
-const tempEl = document.querySelector(".main-weather h1");
-const descEl = document.querySelector(".main-weather p");
-const infoEl = document.querySelector(".main-weather span");
-const mainWeatherIcon = document.querySelector(".weather-icon");
-const cards = document.querySelectorAll(".highlights .card");
+
+const tempEl = document.getElementById("temp");
+const descEl = document.getElementById("desc");
+const locationEl = document.getElementById("location");
+const iconEl = document.getElementById("mainWeatherIcon");
+
+const windEl = document.getElementById("wind");
+const humidityEl = document.getElementById("humidity");
+const visibilityEl = document.getElementById("visibility");
+const feelsEl = document.getElementById("feels");
+
 const uvPath = document.querySelector(".uv-progress");
 const uvText = document.getElementById("uvValue");
+
 const forecastList = document.getElementById("forecastList");
 
 const UV_MAX = 11;
@@ -47,68 +45,98 @@ const weatherIcons = {
 };
 
 async function getWeather(city) {
-  if (!city.trim()) {
-    alert("Please enter a city name");
-    return;
-  }
-  
+  if (!city) return;
+
   try {
-    const weatherRes = await fetch(
+    const res = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
     );
 
-    if (!weatherRes.ok) {
-      if (weatherRes.status === 404) {
-        throw new Error("City not found");
-      }
-      throw new Error(`Error: ${weatherRes.status}`);
-    }
+    if (!res.ok) throw new Error("City not found");
 
-    const weatherData = await weatherRes.json();
-    
-    updateUI(weatherData);
+    const data = await res.json();
+    updateUI(data);
 
-    const { lat, lon } = weatherData.coord;
-    
-    const forecastRes = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
-    );
-    
-    if (forecastRes.ok) {
-      const forecastData = await forecastRes.json();
-      processForecastData(forecastData);
-    }
-    
-    getUVIndex(lat, lon);
+    const { lat, lon } = data.coord;
+
+    await Promise.all([
+      getForecast(lat, lon),
+      getUVIndex(lat, lon)
+    ]);
 
   } catch (err) {
     alert(err.message);
   }
 }
 
+async function getForecast(lat, lon) {
+  const res = await fetch(
+    `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
+  );
+
+  const data = await res.json();
+  processForecast(data.list);
+}
+
+function processForecast(list) {
+  const days = {};
+
+  list.forEach(item => {
+    const key = new Date(item.dt * 1000).toDateString();
+    if (!days[key]) days[key] = [];
+    days[key].push(item);
+  });
+
+  renderForecast(Object.values(days).slice(1, 8));
+}
+
+function renderForecast(days) {
+  forecastList.innerHTML = "";
+
+  days.forEach(day => {
+    const avgTemp = Math.round(
+      day.reduce((sum, d) => sum + d.main.temp, 0) / day.length
+    );
+
+    const iconCode = day[Math.floor(day.length / 2)].weather[0].icon;
+    const iconClass = weatherIcons[iconCode];
+
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <span>${new Date(day[0].dt * 1000).toLocaleDateString("en-US", {
+        weekday: "short"
+      })}</span>
+      <i class="${iconClass}"></i>
+      <span>${avgTemp}°</span>
+    `;
+
+    forecastList.appendChild(li);
+  });
+}
+
 async function getUVIndex(lat, lon) {
-  try {
-    const mockUV = Math.random() * 11;
-    animateUV(mockUV);
-    
-  } catch (err) {
-    animateUV(5.5);
+  const res = await fetch(
+    `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&appid=${apiKey}`
+  );
+
+  const data = await res.json();
+
+  if (!data.current || typeof data.current.uvi !== "number") {
+    animateUV(0);
+    return;
   }
+
+  animateUV(data.current.uvi);
 }
 
 function animateUV(uv) {
-  if (!uvPath || !uvText) return;
-  
-  const safeUV = Math.min(uv, UV_MAX);
-  const progress = safeUV / UV_MAX;
-  const offset = ARC_LENGTH - (progress * ARC_LENGTH);
-  
+  const value = Math.min(uv, UV_MAX);
+  const progress = value / UV_MAX;
+  const offset = ARC_LENGTH - progress * ARC_LENGTH;
+
   uvPath.style.strokeDashoffset = offset;
-  uvText.innerText = uv.toFixed(1);
-  
-  const color = getUVColor(uv);
-  uvPath.style.stroke = color;
-  uvText.style.color = color;
+  uvPath.style.stroke = getUVColor(value);
+  uvText.textContent = value.toFixed(1);
 }
 
 function getUVColor(uv) {
@@ -119,101 +147,19 @@ function getUVColor(uv) {
   return "#a855f7";
 }
 
-function processForecastData(forecastData) {
-  const dailyForecasts = {};
-  
-  forecastData.list.forEach(item => {
-    const date = new Date(item.dt * 1000);
-    const dayKey = date.toDateString();
-    
-    if (!dailyForecasts[dayKey]) {
-      dailyForecasts[dayKey] = {
-        date: date,
-        temps: [],
-        icons: []
-      };
-    }
-    
-    dailyForecasts[dayKey].temps.push(item.main.temp);
-    dailyForecasts[dayKey].icons.push(item.weather[0].icon);
-  });
-  
-  const next7Days = Object.values(dailyForecasts).slice(1, 8);
-  renderForecast(next7Days);
-}
-
-function renderForecast(days) {
-  if (!forecastList) return;
-  
-  forecastList.innerHTML = "";
-  
-  days.forEach(day => {
-    const date = day.date.toLocaleDateString("en-US", {
-      weekday: "short"
-    });
-    
-    const avgTemp = Math.round(day.temps.reduce((a, b) => a + b) / day.temps.length);
-    const iconCode = day.icons[Math.floor(day.icons.length / 2)];
-    const iconClass = weatherIcons[iconCode] || "fas fa-cloud";
-    
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <span>${date}</span>
-      <span><i class="${iconClass}"></i></span>
-      <span>${avgTemp}°</span>
-    `;
-    
-    forecastList.appendChild(li);
-  });
-}
-
 function updateUI(data) {
   const { name, sys, main, weather, wind, visibility, dt } = data;
-  
-  tempEl.innerHTML = `${Math.round(main.temp)}°`;
-  descEl.innerText = weather[0].description;
-  
-  const currentTime = new Date(dt * 1000).toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-  
-  infoEl.innerHTML = `<i class="fas fa-map-pin"></i> ${name}, ${sys.country} • ${currentTime}`;
-  
-  const iconCode = weather[0].icon;
-  const iconClass = weatherIcons[iconCode] || "fas fa-cloud";
-  if (mainWeatherIcon) {
-    mainWeatherIcon.innerHTML = `<i class="${iconClass} fa-3x"></i>`;
-  }
-  
-  if (cards[0]) {
-    cards[0].querySelector("h2").innerHTML = `${wind.speed} <span>km/h</span>`;
-  }
-  
-  if (cards[1]) {
-    cards[1].querySelector(".uv-value").innerText = "0.0";
-  }
-  
-  if (cards[2]) {
-    cards[2].innerHTML = `
-      <h4><i class="fas fa-sun"></i> Sunrise & Sunset</h4>
-      <p><i class="fas fa-sunrise"></i> ${formatTime(sys.sunrise)}</p>
-      <p><i class="fas fa-sunset"></i> ${formatTime(sys.sunset)}</p>
-    `;
-  }
-  
-  if (cards[3]) {
-    cards[3].querySelector("h2").innerText = `${main.humidity}%`;
-  }
-  
-  if (cards[4]) {
-    const visibilityKm = visibility ? `${(visibility/1000).toFixed(1)}` : "N/A";
-    cards[4].querySelector("h2").innerText = `${visibilityKm} km`;
-  }
-  
-  if (cards[5]) {
-    cards[5].querySelector("h2").innerText = `${Math.round(main.feels_like)}°`;
-  }
+
+  tempEl.textContent = `${Math.round(main.temp)}°`;
+  descEl.textContent = weather[0].description;
+  feelsEl.textContent = `${Math.round(main.feels_like)}°`;
+  humidityEl.textContent = `${main.humidity}%`;
+  windEl.textContent = `${wind.speed} km/h`;
+  visibilityEl.textContent = `${(visibility / 1000).toFixed(1)} km`;
+
+  locationEl.textContent = `${name}, ${sys.country} • ${formatTime(dt)}`;
+
+  iconEl.innerHTML = `<i class="${weatherIcons[weather[0].icon]}"></i>`;
 }
 
 function formatTime(unix) {
@@ -223,26 +169,18 @@ function formatTime(unix) {
   });
 }
 
-cityInput.addEventListener("keypress", e => {
+searchBtn.addEventListener("click", () => {
+  getWeather(cityInput.value.trim());
+  cityInput.value = "";
+});
+
+cityInput.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     getWeather(cityInput.value.trim());
     cityInput.value = "";
   }
 });
 
-if (searchBtn) {
-  searchBtn.addEventListener("click", () => {
-    getWeather(cityInput.value.trim());
-    cityInput.value = "";
-  });
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
-    animateUV(7.5);
-  }, 500);
-  
-  setTimeout(() => {
-    getWeather("Visakhapatnam");
-  }, 1000);
+  getWeather("Visakhapatnam");
 });
