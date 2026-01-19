@@ -72,6 +72,38 @@ body {
     transition: transform 0.3s ease;
 }
 
+.uv-card {
+  position: relative;
+  text-align: center;
+}
+
+.uv-gauge {
+  width: 100%;
+  max-width: 180px;
+  margin: 10px auto;
+}
+
+.uv-bg {
+  fill: none;
+  stroke: rgba(255,255,255,0.1);
+  stroke-width: 12;
+}
+
+.uv-progress {
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-dasharray: 251;
+  stroke-dashoffset: 251;
+  transition: stroke-dashoffset 1s ease;
+}
+
+.uv-value {
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: -10px;
+}
+
 .main-weather {
   display: flex;
   justify-content: space-between;

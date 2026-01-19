@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Weathry – Premium Weather Dashboard</title>
+  <title>ArcWeather – Premium Weather Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -11,7 +11,7 @@
 <div class="app">
 
   <aside class="sidebar">
-    <h2 class="logo">Weathry</h2>
+    <h2 class="logo">ArcWeather</h2>
     <nav>
       <button class="active">☀</button>
       <button>📍</button>
@@ -41,9 +41,22 @@
         <h4>Wind Status</h4>
         <h2>7.9 <span>km/h</span></h2>
       </div>
-      <div class="card">
+      <div class="card uv-card">
         <h4>UV Index</h4>
-        <h2>5.5</h2>
+
+        <svg class="uv-gauge" viewBox="0 0 200 120">
+            <path
+                d="M20 100 A80 80 0 0 1 180 100"
+                class="uv-bg"
+            />
+
+            <path
+                d="M20 100 A80 80 0 0 1 180 100"
+                class="uv-progress"
+                />
+        </svg>
+
+        <div class = "uv-value" id = "uvValue">0.0</div>
       </div>
       <div class="card">
         <h4>Sunrise & Sunset</h4>
