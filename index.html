@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weathry – Premium Weather Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <h2 class="logo">Weathry</h2>
+    <nav>
+      <button class="active">☀</button>
+      <button>📍</button>
+      <button>🗺</button>
+      <button>⚙</button>
+    </nav>
+    <div class="profile">👤</div>
+  </aside>
+
+  <main class="main">
+
+    <section class="card main-weather">
+      <div>
+        <h1>28°</h1>
+        <p>Rainy Storm Clouds</p>
+        <span>Florida, US • 5:01 AM</span>
+      </div>
+      <div class="icon">⛈</div>
+    </section>
+
+    <section class="highlights">
+      <div class="card">
+        <h4>Wind Status</h4>
+        <h2>7.9 <span>km/h</span></h2>
+      </div>
+      <div class="card">
+        <h4>UV Index</h4>
+        <h2>5.5</h2>
+      </div>
+      <div class="card">
+        <h4>Sunrise & Sunset</h4>
+        <p>🌅 5:50 AM</p>
+        <p>🌇 6:30 PM</p>
+      </div>
+      <div class="card">
+        <h4>Humidity</h4>
+        <h2>84%</h2>
+      </div>
+      <div class="card">
+        <h4>Visibility</h4>
+        <h2>03 km</h2>
+      </div>
+      <div class="card">
+        <h4>Feels Like</h4>
+        <h2>42°</h2>
+      </div>
+    </section>
+
+    <section class="bottom">
+      <div class="card forecast">
+        <h3>7 Days Forecast</h3>
+        <ul>
+          <li>Tue 🌧 29° / 18°</li>
+          <li>Wed ☁ 21° / 16°</li>
+          <li>Thu 🌦 24° / 20°</li>
+          <li>Fri ☀ 30° / 17°</li>
+        </ul>
+      </div>
+
+      <div class="card map">
+        <h3>Weather Condition Map</h3>
+        <div class="map-box">🗺 Map Preview</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
