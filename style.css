@@ -123,9 +123,18 @@ body {
   margin-top: 10px;
 }
 
-.forecast li {
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+#forecastList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 14px;
+}
+
+#forecastList img {
+  width: 32px;
+  height: 32px;
 }
 
 .map-box {
