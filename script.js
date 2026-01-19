@@ -79,6 +79,29 @@ async function getForecast(lat, lon) {
   processForecast(data.list);
 }
 
+function getDayDuration(sunrise, sunset) {
+  const hours = ((sunset - sunrise) / 3600).toFixed(1);
+  return `${hours} hrs daylight`;
+}
+
+function humidityLabel(h) {
+  if (h < 30) return "Dry";
+  if (h < 60) return "Comfortable";
+  return "Humid";
+}
+
+function feelsComparison(temp, feels) {
+  if (feels > temp + 2) return "Feels warmer";
+  if (feels < temp - 2) return "Feels cooler";
+  return "Feels normal";
+}
+
+function windDirection(deg) {
+  const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+  return dirs[Math.round(deg / 45) % 8];
+}
+
+
 function processForecast(list) {
   const days = {};
 
@@ -158,6 +181,34 @@ function updateUI(data) {
   humidityEl.textContent = `${data.main.humidity}%`;
   windEl.textContent = `${data.wind.speed} km/h`;
   visibilityEl.textContent = `${(data.visibility / 1000).toFixed(1)} km`;
+
+  document.getElementById("sun").innerHTML = `
+  ${formatTime(data.sys.sunrise)} / ${formatTime(data.sys.sunset)}
+  <small style="display:block;opacity:.7;margin-top:6px">
+    ${getDayDuration(data.sys.sunrise, data.sys.sunset)}
+  </small>
+`;
+
+humidityEl.innerHTML = `
+  ${data.main.humidity}%
+  <small style="display:block;opacity:.7;margin-top:6px">
+    ${humidityLabel(data.main.humidity)}
+  </small>
+`;
+
+feelsEl.innerHTML = `
+  ${Math.round(data.main.feels_like)}°
+  <small style="display:block;opacity:.7;margin-top:6px">
+    ${feelsComparison(data.main.temp, data.main.feels_like)}
+  </small>
+`;
+
+windEl.innerHTML = `
+  ${data.wind.speed} km/h
+  <small style="display:block;opacity:.7;margin-top:6px">
+    Direction: ${windDirection(data.wind.deg)}
+  </small>
+`;
 
   locationEl.textContent =
     `${data.name}, ${data.sys.country} • ${formatTime(data.dt)}`;
