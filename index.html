@@ -5,6 +5,7 @@
   <title>ArcWeather – Premium Weather Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -13,79 +14,78 @@
   <aside class="sidebar">
     <h2 class="logo">ArcWeather</h2>
     <nav>
-      <button class="active">☀</button>
-      <button>📍</button>
-      <button>🗺</button>
-      <button>⚙</button>
+      <button class="active"><i class="fas fa-sun"></button>
+      <button><i class = "fas fa-map-marker-alt"></i></button>
+      <button><i class = "fas fa-map"></i></button>
+      <button><i class = "fas fa-cog"></i></button>
     </nav>
-    <div class="profile">👤</div>
+    <div class="profile"><i class="fas fa-user"></div>
   </aside>
 
   <main class="main">
 
     <section class="card main-weather">
-      <div>
+      <div class = "weather-info">
         <h1>28°</h1>
         <p>Rainy Storm Clouds</p>
-        <span>Florida, US • 5:01 AM</span>
+        <span><i class="fas fa-map-pin"></i>Visakhapatnam, India • 5:01 AM</span>
       </div>
-      <div class="icon">⛈</div>
+      <div class="weather-icon" id = "main-weather-icon">
+        <i class="fas fa-cloud-showers-heavy fa-3x"></i>
+      </div>
 
       <div class="search">
             <input type="text" placeholder="Search city..." id="cityInput">
+            <button id="searchBtn"><i class="fas fa-search"></i></button>
         </div>
     </section>
 
     <section class="highlights">
       <div class="card">
-        <h4>Wind Status</h4>
+        <h4><i class="fas fa-wind"></i> Wind Status</h4>
         <h2>7.9 <span>km/h</span></h2>
       </div>
       <div class="card uv-card">
-        <h4>UV Index</h4>
+        <h4><i class="fas fa-sun"></i> UV Index</h4>
 
         <svg class="uv-gauge" viewBox="0 0 200 120">
-            <path
-                d="M20 100 A80 80 0 0 1 180 100"
-                class="uv-bg"
-            />
-
-            <path
-                d="M20 100 A80 80 0 0 1 180 100"
-                class="uv-progress"
-                />
+            <path d="M20 100 A80 80 0 0 1 180 100" class="uv-bg"/>
+            <path d="M20 100 A80 80 0 0 1 180 100" class="uv-progress"/>
         </svg>
 
         <div class = "uv-value" id = "uvValue">0.0</div>
       </div>
       <div class="card">
-        <h4>Sunrise & Sunset</h4>
-        <p>5:50 AM</p>
-        <p>6:30 PM</p>
+        <h4><i class="fas fa-sun"></i>Sunrise & Sunset</h4>
+        <p><i class="fas fa-sunrise"></i>5:50 AM</p>
+        <p><i class="fas fa-sunset"></i>6:30 PM</p>
       </div>
       <div class="card">
-        <h4>Humidity</h4>
+        <h4><i class="fas fa-tint"></i> Humidity</h4>
         <h2>84%</h2>
       </div>
       <div class="card">
-        <h4>Visibility</h4>
+        <h4><i class="fas fa-eye"></i> Visibility</h4>
         <h2>03 km</h2>
       </div>
       <div class="card">
-        <h4>Feels Like</h4>
+        <h4><i class="fas fa-temperature-high"></i> Feels Like</h4>
         <h2>42°</h2>
       </div>
     </section>
 
     <section class="bottom">
       <div class="card forecast">
-        <h3>7 Days Forecast</h3>
+        <h3><i class="fas fa-calendar-alt"></i> 7 Days Forecast</h3>
         <ul id="forecastList"></ul>
       </div>
 
       <div class="card map">
-        <h3>Weather Condition Map</h3>
-        <div class="map-box">🗺 Map Preview</div>
+        <h3><i class="fas fa-map-marked-alt"></i> Weather Condition Map</h3>
+        <div class="map-box">
+            <i class="fas fa-map fa-3x"></i>
+            <p>Map Preview</p>
+        </div>
       </div>
     </section>
 
