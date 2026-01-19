@@ -39,12 +39,40 @@ async function getWeather(city) {
   }
 }
 
+const uvPath = document.querySelector(".uv-progress");
+const uvText = document.getElementById("uvValue");
+
+const UV_MAX = 11;
+const ARC_LENGTH = 251;
+
+function animateUV(uv) {
+  const safeUV = Math.min(uv, UV_MAX);
+  const progress = safeUV / UV_MAX;
+  const offset = ARC_LENGTH - progress * ARC_LENGTH;
+
+  uvPath.style.strokeDashoffset = offset;
+  uvText.innerText = uv.toFixed(1);
+
+  uvPath.style.stroke = getUVColor(uv);
+}
+
+function getUVColor(uv) {
+  if (uv < 3) return "#4ade80";
+  if (uv < 6) return "#facc15";
+  if (uv < 8) return "#fb923c";
+  if (uv < 11) return "#ef4444";
+  return "#a855f7";
+}
+
+
 async function get7DayForecast(lat, lon) {
     const res = await fetch(
         `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,hourly,alerts&units=metric&appid=${apiKey}`
     );
 
     const data = await res.json();
+
+    animateUV(data.current.uvi);
     renderForecast(data.daily);
 }
 
