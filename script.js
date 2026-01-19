@@ -1,6 +1,8 @@
 console.log("Weather dashboard loaded");
+const ENABLE_MAP = false;
 
 const apiKey = "b8b194e0af47f755994f27a30ba55d45";
+const mapboxToken = "YOUR_MAPBOX_PUBLIC_TOKEN";
 
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
@@ -44,6 +46,8 @@ const weatherIcons = {
   "50n": "fas fa-smog"
 };
 
+let map = null;
+
 async function getWeather(city) {
   if (!city) return;
 
@@ -59,10 +63,7 @@ async function getWeather(city) {
 
     const { lat, lon } = data.coord;
 
-    await Promise.all([
-      getForecast(lat, lon),
-      getUVIndex(lat, lon)
-    ]);
+    getForecast(lat, lon);
 
   } catch (err) {
     alert(err.message);
@@ -99,40 +100,27 @@ function renderForecast(days) {
     );
 
     const iconCode = day[Math.floor(day.length / 2)].weather[0].icon;
-    const iconClass = weatherIcons[iconCode];
 
     const li = document.createElement("li");
     li.innerHTML = `
-      <span>${new Date(day[0].dt * 1000).toLocaleDateString("en-US", {
-        weekday: "short"
-      })}</span>
-      <i class="${iconClass}"></i>
+      <span>${new Date(day[0].dt * 1000).toLocaleDateString("en-US", { weekday: "short" })}</span>
+      <i class="${weatherIcons[iconCode]}"></i>
       <span>${avgTemp}°</span>
     `;
-
     forecastList.appendChild(li);
   });
 }
 
-async function getUVIndex(lat, lon) {
-  const res = await fetch(
-    `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&appid=${apiKey}`
-  );
-
-  const data = await res.json();
-
-  if (!data.current || typeof data.current.uvi !== "number") {
-    animateUV(0);
-    return;
-  }
-
-  animateUV(data.current.uvi);
+function calculateUV(data) {
+  const hour = new Date(data.dt * 1000).getHours();
+  const sunFactor = Math.max(0, Math.sin((Math.PI * (hour - 6)) / 12));
+  const cloudFactor = 1 - data.clouds.all / 100;
+  return Math.min(11, Math.max(0, sunFactor * cloudFactor * 11));
 }
 
 function animateUV(uv) {
   const value = Math.min(uv, UV_MAX);
-  const progress = value / UV_MAX;
-  const offset = ARC_LENGTH - progress * ARC_LENGTH;
+  const offset = ARC_LENGTH - (value / UV_MAX) * ARC_LENGTH;
 
   uvPath.style.strokeDashoffset = offset;
   uvPath.style.stroke = getUVColor(value);
@@ -147,19 +135,37 @@ function getUVColor(uv) {
   return "#a855f7";
 }
 
+function updateWindGraph(speed) {
+  const base = 80;
+  const points = Array.from({ length: 6 }, (_, i) => {
+    const x = i * 60;
+    const y = base - Math.random() * speed * 2;
+    return `${x},${y}`;
+  }).join(" ");
+
+  const line = document.querySelector(".wind-line");
+  if (line) line.setAttribute("points", points);
+}
+
+function initMap(lat, lon) {
+  if (!ENABLE_MAP) return;
+}
+
 function updateUI(data) {
-  const { name, sys, main, weather, wind, visibility, dt } = data;
+  tempEl.textContent = `${Math.round(data.main.temp)}°`;
+  descEl.textContent = data.weather[0].description;
+  feelsEl.textContent = `${Math.round(data.main.feels_like)}°`;
+  humidityEl.textContent = `${data.main.humidity}%`;
+  windEl.textContent = `${data.wind.speed} km/h`;
+  visibilityEl.textContent = `${(data.visibility / 1000).toFixed(1)} km`;
 
-  tempEl.textContent = `${Math.round(main.temp)}°`;
-  descEl.textContent = weather[0].description;
-  feelsEl.textContent = `${Math.round(main.feels_like)}°`;
-  humidityEl.textContent = `${main.humidity}%`;
-  windEl.textContent = `${wind.speed} km/h`;
-  visibilityEl.textContent = `${(visibility / 1000).toFixed(1)} km`;
+  locationEl.textContent =
+    `${data.name}, ${data.sys.country} • ${formatTime(data.dt)}`;
 
-  locationEl.textContent = `${name}, ${sys.country} • ${formatTime(dt)}`;
+  iconEl.innerHTML = `<i class="${weatherIcons[data.weather[0].icon]}"></i>`;
 
-  iconEl.innerHTML = `<i class="${weatherIcons[weather[0].icon]}"></i>`;
+  animateUV(calculateUV(data));
+  updateWindGraph(data.wind.speed);
 }
 
 function formatTime(unix) {
