@@ -1,7 +1,6 @@
 console.log("Weather dashboard loaded");
 const ENABLE_MAP = false;
 
-const apiKey = "b8b194e0af47f755994f27a30ba55d45";
 const mapboxToken = "YOUR_MAPBOX_PUBLIC_TOKEN";
 
 const cityInput = document.getElementById("cityInput");
@@ -52,9 +51,7 @@ async function getWeather(city) {
   if (!city) return;
 
   try {
-    const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
-    );
+    const res = await fetch(`/api/weather?city=${city}`);
 
     if (!res.ok) throw new Error("City not found");
 
@@ -71,9 +68,7 @@ async function getWeather(city) {
 }
 
 async function getForecast(lat, lon) {
-  const res = await fetch(
-    `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
-  );
+  const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
 
   const data = await res.json();
   processForecast(data.list);
